@@ -1,0 +1,352 @@
+flash_target:
+  s4_qspi:
+    sequence:
+      - wait_for: ">"
+        send: const
+        val: "xls2\r"
+      - wait_for: "(1-3)>"
+        send: const
+        val: "1\r"
+      - wait_for: "(Push Y key)"
+        send: const
+        val: "Y"
+      - wait_for: "(Push Y key)"
+        send: const
+        val: "Y"
+      - wait_for: "Please Input : H'"
+        send: img_addr
+      - wait_for: "Please Input : H'"
+        send: flash_addr
+      - wait_for: "(Motorola S-record)"
+        send: file
+      - wait_for: "(y/n)"
+        send: const
+        val: "y"
+  s4_emmc:
+    sequence:
+      - wait_for: ">"
+        send: const
+        val: "em_w\r"
+      - wait_for: "(Push Y key)"
+        send: const
+        val: "Y"
+      - wait_for: "(0-2)>"
+        send: const
+        val: "1\r"
+      - wait_for: "Please Input Start Address in sector :"
+        send: flash_addr
+      - wait_for: "Please Input Program Start Address :"
+        send: img_addr
+      - wait_for: "please send ! (Motorola S-record)"
+        send: file
+  gen3_hf:
+    # TODO: Test and correct seq for gen3
+    sequence:
+      - wait_for: ">"
+        send: const
+        val: "xls2\r"
+      - wait_for: "(1-3)>"
+        send: const
+        val: "3\r"
+      - wait_for: "(Push Y key)"
+        send: const
+        val: "Y"
+      - wait_for: "(Push Y key)"
+        send: const
+        val: "Y"
+      - wait_for: "Please Input : H'"
+        send: img_addr
+      - wait_for: "Please Input : H'"
+        send: flash_addr
+      - wait_for: "(Motorola S-record)"
+        send: file
+      - wait_for: "(y/n)"
+        send: const
+        val: "y"
+
+board:
+  e3_2x512:
+    flash_writer: AArch64_Gen3_E3_Scif_MiniMon_develop_Ebisu_V0.02.mot
+    ipls:
+      bl2:
+        file: bl2-ebisu.srec
+        flash_addr: 0x40000
+        flash_target: gen3_hf
+      bl31:
+        file: bl31-ebisu.srec
+        flash_addr: 0x1C0000
+        flash_target: gen3_hf
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+        flash_target: gen3_hf
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+        flash_target: gen3_hf
+      tee:
+        file: tee-ebisu.srec
+        flash_addr: 0x200000
+      u-boot:
+        file: u-boot-elf-ebisu.srec
+        flash_addr: 0x640000
+  e3_4x512:
+    flash_writer: AArch64_Gen3_E3-4D_Scif_MiniMon_V5.03A.mot
+    ipls:
+      bl2:
+        file: bl2-ebisu-4d.srec
+        flash_addr: 0x40000
+      bl31:
+        file: bl31-ebisu-4d.srec
+        flash_addr: 0x1C0000
+      bootparam:
+        file: bootparam_sa0-4d.srec
+        flash_addr: 0x0
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+      tee:
+        file: tee-ebisu.srec
+        flash_addr: 0x200000
+      u-boot:
+        file: u-boot-elf-ebisu.srec
+        flash_addr: 0x640000
+  h3_2x2:
+    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    ipls:
+      bl2:
+        file: bl2-salvator-x-2x2g.srec
+        flash_addr: 0x40000
+      bl31:
+        file: bl31-salvator-x-2x2g.srec
+        flash_addr: 0x1C0000
+      bootparam:
+        file: bootparam_sa0-2x2g.srec
+        flash_addr: 0x0
+      cert_header:
+        file: cert_header_sa6-2x2g.srec
+        flash_addr: 0x180000
+      tee:
+        file: tee-salvator-x.srec
+        flash_addr: 0x200000
+      u-boot:
+        file: u-boot-elf-salvator-xs-4x2g.srec
+        flash_addr: 0x640000
+  h3_4x1:
+    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    ipls:
+      bl2:
+        file: bl2-salvator-x.srec
+        flash_addr: 0x40000
+      bl31:
+        file: bl31-salvator-x.srec
+        flash_addr: 0x1C0000
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+      tee:
+        file: tee-salvator-x.srec
+        flash_addr: 0x200000
+      u-boot:
+        file: u-boot-elf-salvator-xs.srec
+        flash_addr: 0x640000
+  h3_4x2:
+    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    ipls:
+      bl2:
+        file: bl2-salvator-x-4x2g.srec
+        flash_addr: 0x40000
+      bl31:
+        file: bl31-salvator-x-4x2g.srec
+        flash_addr: 0x1C0000
+      bootparam:
+        file: bootparam_sa0-4x2g.srec
+        flash_addr: 0x0
+      cert_header:
+        file: cert_header_sa6-4x2g.srec
+        flash_addr: 0x180000
+      tee:
+        file: tee-salvator-x.srec
+        flash_addr: 0x200000
+      u-boot:
+        file: u-boot-elf-salvator-xs-4x2g.srec
+        flash_addr: 0x640000
+  h3ulcb:
+    flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    ipls:
+      bl2:
+        file: bl2-h3ulcb.srec
+        flash_addr: 0x40000
+      bl31:
+        file: bl31-h3ulcb.srec
+        flash_addr: 0x1C0000
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+      tee:
+        file: tee-h3ulcb.srec
+        flash_addr: 0x200000
+      u-boot:
+        file: u-boot-elf.srec
+        flash_addr: 0x640000
+  m3:
+    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
+    ipls:
+      bl2:
+        file: bl2-salvator-x.srec
+        flash_addr: 0x40000
+      bl31:
+        file: bl31-salvator-x.srec
+        flash_addr: 0x1C0000
+        flash_target: gen3_hf
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+        flash_target: gen3_hf
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+        flash_target: gen3_hf
+      tee:
+        file: tee-salvator-x.srec
+        flash_addr: 0x200000
+        flash_target: gen3_hf
+      u-boot:
+        file: u-boot-elf-salvator-xs.srec
+        flash_addr: 0x640000
+        flash_target: gen3_hf
+  m3_2x4:
+    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
+    ipls:
+      bl2:
+        file: bl2-salvator-x.srec
+        flash_addr: 0x40000
+        flash_target: gen3_hf
+      bl31:
+        file: bl31-salvator-x.srec
+        flash_addr: 0x1C0000
+        flash_target: gen3_hf
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+        flash_target: gen3_hf
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+        flash_target: gen3_hf
+      tee:
+        file: tee-salvator-x.srec
+        flash_addr: 0x200000
+        flash_target: gen3_hf
+      u-boot:
+        file: u-boot-elf-salvator-xs-2x4g.srec
+        flash_addr: 0x640000
+        flash_target: gen3_hf
+  m3n:
+    flash_writer: AArch64_Gen3_Scif_MiniMon_Develop_M3N_V0.03.mot
+    ipls:
+      bl2:
+        file: bl2-salvator-x.srec
+        flash_addr: 0x40000
+        flash_target: gen3_hf
+      bl31:
+        file: bl31-salvator-x.srec
+        flash_addr: 0x1C0000
+        flash_target: gen3_hf
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+        flash_target: gen3_hf
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+        flash_target: gen3_hf
+      tee:
+        file: tee-salvator-x.srec
+        flash_addr: 0x200000
+        flash_target: gen3_hf
+      u-boot:
+        file: u-boot-elf-salvator-xs.srec
+        flash_addr: 0x640000
+        flash_target: gen3_hf
+  m3ulcb:
+    flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    ipls:
+      bl2:
+        file: bl2-m3ulcb.srec
+        flash_addr: 0x40000
+        flash_target: gen3_hf
+      bl31:
+        file: bl31-m3ulcb.srec
+        flash_addr: 0x1C0000
+        flash_target: gen3_hf
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+        flash_target: gen3_hf
+      cert_header:
+        file: cert_header_sa6.srec
+        flash_addr: 0x180000
+        flash_target: gen3_hf
+      tee:
+        file: tee-m3ulcb.srec
+        flash_addr: 0x200000
+        flash_target: gen3_hf
+      u-boot:
+        file: u-boot-elf.srec
+        flash_addr: 0x640000
+        flash_target: gen3_hf
+  s4:
+    flash_writer: ICUMX_Flash_writer_SCIF_DUMMY_CERT_EB203000_S4.mot
+    baud: 1843200
+    ipls:
+      cr52:
+        file: App_CDD_ICCOM_S4_Sample_CR52.srec
+        flash_addr: 0x500000
+        flash_target: s4_qspi
+      g4mh:
+        file: App_CDD_ICCOM_S4_Sample_G4MH.srec
+        flash_addr: 0x900000
+        flash_target: s4_qspi
+      bl31:
+        flash_target: s4_emmc
+        file: bl31-spider.srec
+        flash_addr: 0x7000
+      bootparam:
+        flash_target: s4_qspi
+        file: bootparam_sa0.srec
+        flash_addr: 0x0
+      ca55_loader:
+        flash_target: s4_qspi
+        file: ca55_loader.srec
+        flash_addr: 0x480000
+      cert_header:
+        flash_target: s4_qspi
+        file: cert_header_sa9.srec
+        flash_addr: 0x240000
+      dummy_fw:
+        flash_target: s4_qspi
+        file: dummy_fw.srec
+        flash_addr: 0x280000
+      dummy_icumh_case1:
+        flash_target: s4_qspi
+        file: dummy_icumh_case1.srec
+        flash_addr: 0x380000
+      icumx_loader:
+        flash_target: s4_qspi
+        file: icumx_loader.srec
+        flash_addr: 0x40000
+      tee:
+        flash_target: s4_emmc
+        file: tee-spider.srec
+        flash_addr: 0x7400
+      u-boot:
+        flash_target: s4_emmc
+        file: u-boot-elf.srec
+        flash_addr: 0x7C00
