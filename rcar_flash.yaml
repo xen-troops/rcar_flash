@@ -87,120 +87,153 @@ board:
       tee:
         file: tee-ebisu.srec
         flash_addr: 0x200000
+        flash_target: gen3_hf
       u-boot:
         file: u-boot-elf-ebisu.srec
         flash_addr: 0x640000
+        flash_target: gen3_hf
   e3_4x512:
     flash_writer: AArch64_Gen3_E3-4D_Scif_MiniMon_V5.03A.mot
     ipls:
       bl2:
         file: bl2-ebisu-4d.srec
         flash_addr: 0x40000
+        flash_target: gen3_hf
       bl31:
         file: bl31-ebisu-4d.srec
         flash_addr: 0x1C0000
+        flash_target: gen3_hf
       bootparam:
         file: bootparam_sa0-4d.srec
         flash_addr: 0x0
+        flash_target: gen3_hf
       cert_header:
         file: cert_header_sa6.srec
         flash_addr: 0x180000
+        flash_target: gen3_hf
       tee:
         file: tee-ebisu.srec
         flash_addr: 0x200000
+        flash_target: gen3_hf
       u-boot:
         file: u-boot-elf-ebisu.srec
         flash_addr: 0x640000
+        flash_target: gen3_hf
   h3_2x2:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
     ipls:
       bl2:
         file: bl2-salvator-x-2x2g.srec
         flash_addr: 0x40000
+        flash_target: gen3_hf
       bl31:
         file: bl31-salvator-x-2x2g.srec
         flash_addr: 0x1C0000
+        flash_target: gen3_hf
       bootparam:
         file: bootparam_sa0-2x2g.srec
         flash_addr: 0x0
+        flash_target: gen3_hf
       cert_header:
         file: cert_header_sa6-2x2g.srec
         flash_addr: 0x180000
+        flash_target: gen3_hf
       tee:
         file: tee-salvator-x.srec
         flash_addr: 0x200000
+        flash_target: gen3_hf
       u-boot:
         file: u-boot-elf-salvator-xs-4x2g.srec
         flash_addr: 0x640000
+        flash_target: gen3_hf
   h3_4x1:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
     ipls:
       bl2:
         file: bl2-salvator-x.srec
         flash_addr: 0x40000
+        flash_target: gen3_hf
       bl31:
         file: bl31-salvator-x.srec
         flash_addr: 0x1C0000
+        flash_target: gen3_hf
       bootparam:
         file: bootparam_sa0.srec
         flash_addr: 0x0
+        flash_target: gen3_hf
       cert_header:
         file: cert_header_sa6.srec
         flash_addr: 0x180000
+        flash_target: gen3_hf
       tee:
         file: tee-salvator-x.srec
         flash_addr: 0x200000
+        flash_target: gen3_hf
       u-boot:
         file: u-boot-elf-salvator-xs.srec
         flash_addr: 0x640000
+        flash_target: gen3_hf
   h3_4x2:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
     ipls:
       bl2:
         file: bl2-salvator-x-4x2g.srec
         flash_addr: 0x40000
+        flash_target: gen3_hf
       bl31:
         file: bl31-salvator-x-4x2g.srec
         flash_addr: 0x1C0000
+        flash_target: gen3_hf
       bootparam:
         file: bootparam_sa0-4x2g.srec
         flash_addr: 0x0
+        flash_target: gen3_hf
       cert_header:
         file: cert_header_sa6-4x2g.srec
         flash_addr: 0x180000
+        flash_target: gen3_hf
       tee:
         file: tee-salvator-x.srec
         flash_addr: 0x200000
+        flash_target: gen3_hf
       u-boot:
         file: u-boot-elf-salvator-xs-4x2g.srec
         flash_addr: 0x640000
+        flash_target: gen3_hf
   h3ulcb:
     flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
     ipls:
       bl2:
         file: bl2-h3ulcb.srec
         flash_addr: 0x40000
+        flash_target: gen3_hf
       bl31:
         file: bl31-h3ulcb.srec
         flash_addr: 0x1C0000
+        flash_target: gen3_hf
       bootparam:
         file: bootparam_sa0.srec
         flash_addr: 0x0
+        flash_target: gen3_hf
       cert_header:
         file: cert_header_sa6.srec
         flash_addr: 0x180000
+        flash_target: gen3_hf
       tee:
         file: tee-h3ulcb.srec
         flash_addr: 0x200000
+        flash_target: gen3_hf
       u-boot:
         file: u-boot-elf.srec
         flash_addr: 0x640000
+        flash_target: gen3_hf
   m3:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
     ipls:
       bl2:
         file: bl2-salvator-x.srec
         flash_addr: 0x40000
+        flash_target: gen3_hf
       bl31:
         file: bl31-salvator-x.srec
         flash_addr: 0x1C0000
