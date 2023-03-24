@@ -226,6 +226,33 @@ board:
         file: u-boot-elf.srec
         flash_addr: 0x640000
         flash_target: gen3_hf
+  h3ulcb_4x2:
+    flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    ipls:
+      bl2:
+        file: bl2-h3ulcb-4x2g.srec
+        flash_addr: 0x40000
+        flash_target: gen3_hf
+      bl31:
+        file: bl31-h3ulcb-4x2g.srec
+        flash_addr: 0x1C0000
+        flash_target: gen3_hf
+      bootparam:
+        file: bootparam_sa0-4x2g.srec
+        flash_addr: 0x0
+        flash_target: gen3_hf
+      cert_header:
+        file: cert_header_sa6-4x2g.srec
+        flash_addr: 0x180000
+        flash_target: gen3_hf
+      tee:
+        file: tee-h3ulcb.srec
+        flash_addr: 0x200000
+        flash_target: gen3_hf
+      u-boot:
+        file: u-boot-elf.srec
+        flash_addr: 0x640000
+        flash_target: gen3_hf
   m3:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
     ipls:
