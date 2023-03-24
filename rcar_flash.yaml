@@ -40,7 +40,6 @@ flash_target:
       - wait_for: "please send ! (Motorola S-record)"
         send: file
   gen3_hf:
-    # TODO: Test and correct seq for gen3
     sequence:
       - wait_for: ">"
         send: const
@@ -58,7 +57,7 @@ flash_target:
         send: img_addr
       - wait_for: "Please Input : H'"
         send: flash_addr
-      - wait_for: "(Motorola S-record)"
+      - wait_for: "please send ! ('.' & CR stop load)"
         send: file
       - wait_for: "(y/n)"
         send: const
