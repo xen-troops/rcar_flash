@@ -209,6 +209,20 @@ def do_flash(conf, args):
     log.info("All done! You might need to reboot your board")
 
 
+def send_data_with_progress(data, conn: serial.Serial, print_progress=True):
+    bytes_sent = 0
+    total = len(data)
+    while bytes_sent < total:
+        to_send = min(total-bytes_sent, 10*1024)
+        conn.write(data[bytes_sent : bytes_sent+to_send])
+        bytes_sent += to_send
+        if print_progress:
+            print(f"{bytes_sent}/{total}", end="\r")
+    if print_progress:
+        # send "newline char" to start further output on the new line
+        print("")
+
+
 def flash_one_loader(conn, fname, flash_addr, flash_target):
     conn_send(conn, "\r")
 
@@ -223,7 +237,7 @@ def flash_one_loader(conn, fname, flash_addr, flash_target):
         elif evt["send"] == "file":
             with open(fname, "rb") as f:
                 data = f.read()
-                conn.write(data)
+                send_data_with_progress(data, conn)
         else:
             raise Exception(f"Unknown value to send: {evt['send']}")
     conn_wait_for(conn, ">")
@@ -236,7 +250,7 @@ def flash_one_loader_emmc(conn, fname, flash_addr):
 def send_flashwriter(board_conf, fname: str, conn: serial.Serial):
     with open(fname, "rb") as f:
         data = f.read()
-    conn.write(data)
+    send_data_with_progress(data, conn)
     conn_wait_for(conn, ">")
     # TODO: Add support for "sup" command (increase comm speed)
 
