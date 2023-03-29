@@ -153,7 +153,11 @@ def do_flash(conf, args):
                 raise Exception(
                     "You can either use 'all' or define list of loaders")
             for k in board["ipls"].keys():
-                loaders[k] = board["ipls"][k]["file"]
+                loaders[k] = os.path.join(args.path, board["ipls"][k]["file"])
+                if not os.path.exists(loaders[k]):
+                    raise Exception(
+                        f"File {loaders[k]} for loader {k} does not exists!")
+
         else:
             if ':' in l:
                 idx = l.index(":")
@@ -165,7 +169,7 @@ def do_flash(conf, args):
                 ipl_name = l
                 if ipl_name not in board["ipls"]:
                     raise Exception(f"Unknown loader name: {ipl_name}")
-                ipl_file = board["ipls"][ipl_name]["file"]
+                ipl_file = os.path.join(args.path, board["ipls"][ipl_name]["file"])
             if not os.path.exists(ipl_file):
                 raise Exception(
                     f"File {ipl_file} for loader {ipl_name} does not exists!")
