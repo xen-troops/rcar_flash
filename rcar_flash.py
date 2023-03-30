@@ -193,6 +193,11 @@ def do_flash(conf, args):
             raise Exception(f"Flash write file {fname} does not exists!")
         log.info(f"Sending flash writer file {fname}...")
         send_flashwriter(board, fname, conn)
+        if "sup_baud" in board:
+            # Increase comm speed if SUP command is available
+            conn_send(conn, "sup\r")
+            conn.close()
+            conn = open_connection(board, args, use_sup=True)
     else:
         log.info("Please ensure that board is in Monitor mode")
 
@@ -252,10 +257,9 @@ def send_flashwriter(board_conf, fname: str, conn: serial.Serial):
         data = f.read()
     send_data_with_progress(data, conn)
     conn_wait_for(conn, ">")
-    # TODO: Add support for "sup" command (increase comm speed)
 
 
-def open_connection(board_conf, args):
+def open_connection(board_conf, args, use_sup=False):
     # Default value
     dev_name = '/dev/ttyUSB0'
     if args.serial:
@@ -269,7 +273,10 @@ def open_connection(board_conf, args):
         else:
             raise Exception(
                 f"Can't find device with serial number {serial_no}")
-    if "baud" in board_conf:
+    if use_sup and "sup_baud" in board_conf:
+        # use SUP if requested and available
+        baud = board_conf["sup_baud"]
+    elif "baud" in board_conf:
         baud = board_conf["baud"]
     else:
         baud = 115200
