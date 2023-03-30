@@ -120,6 +120,7 @@ board:
         flash_target: gen3_hf
   h3_2x2:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0-2x2g.srec
@@ -147,6 +148,7 @@ board:
         flash_target: gen3_hf
   h3_4x1:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0.srec
@@ -174,6 +176,7 @@ board:
         flash_target: gen3_hf
   h3_4x2:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0-4x2g.srec
@@ -201,6 +204,7 @@ board:
         flash_target: gen3_hf
   h3ulcb:
     flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0.srec
@@ -228,6 +232,7 @@ board:
         flash_target: gen3_hf
   h3ulcb_4x2:
     flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0-4x2g.srec
@@ -255,6 +260,7 @@ board:
         flash_target: gen3_hf
   m3:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0.srec
@@ -282,6 +288,7 @@ board:
         flash_target: gen3_hf
   m3_2x4:
     flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0.srec
@@ -309,6 +316,7 @@ board:
         flash_target: gen3_hf
   m3n:
     flash_writer: AArch64_Gen3_Scif_MiniMon_Develop_M3N_V0.03.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0.srec
@@ -336,6 +344,7 @@ board:
         flash_target: gen3_hf
   m3ulcb:
     flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    sup_baud: 921600
     ipls:
       bootparam:
         file: bootparam_sa0.srec
