@@ -9,10 +9,12 @@ import yaml
 import argparse
 import pathlib
 import traceback
+import time
 from typing import List
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
+cpld_available = False
 
 
 def main():
@@ -141,7 +143,6 @@ def do_list_boards(conf, args):
 
 def do_flash(conf, args):
     board = get_board(conf, args.board)
-    conn = open_connection(board, args)
 
     # Do some sanity checks before tring to flash anything
     # Build list of loaders
@@ -169,7 +170,8 @@ def do_flash(conf, args):
                 ipl_name = l
                 if ipl_name not in board["ipls"]:
                     raise Exception(f"Unknown loader name: {ipl_name}")
-                ipl_file = os.path.join(args.path, board["ipls"][ipl_name]["file"])
+                ipl_file = os.path.join(args.path,
+                                        board["ipls"][ipl_name]["file"])
             if not os.path.exists(ipl_file):
                 raise Exception(
                     f"File {ipl_file} for loader {ipl_name} does not exists!")
@@ -183,12 +185,33 @@ def do_flash(conf, args):
 
     # Check if need to nudge CPLD
     if args.cpld:
-        log.error(
-            "We are sorry, but CPLD communication is not implemented yet")
+        if not cpld_available:
+            raise Exception("pyftdi is not available")
+        if "cpld_profile" not in board:
+            raise Exception(
+                "'cpld_profile' is not set for board, can't control CPLD")
 
+        # Force enable uploading flash_writer, otherwise it have no sense
+        # to use CPLD
+        if not args.flash_writer:
+            args.flash_writer = "DEFAULT"
+
+        cpld_profile = conf["cpld_profiles"][board["cpld_profile"]]
+        dev_serial = cpld_determine_serial(cpld_profile, args)
+        args.cpld = dev_serial
+        cpld = cpld_get_instance(dev_serial, cpld_profile)
+        cpld.check_rev()
+        cpld.serial_mode()
+        cpld.reset()
+        time.sleep(0.5)
+        # Need to release port, so pyserial can use it
+        del cpld
+
+    conn = open_connection(board, args)
     # Upload flash writer if needed
     if args.flash_writer:
-        log.info("Please ensure that board is in the serial download mode")
+        if not args.cpld:
+            log.info("Please ensure that board is in the serial download mode")
         if args.flash_writer == "DEFAULT":
             fname = board["flash_writer"]
         else:
@@ -215,7 +238,15 @@ def do_flash(conf, args):
         )
         flash_one_loader(conn, loaders[k], addr, flash_target)
 
-    log.info("All done! You might need to reboot your board")
+    conn.close()
+
+    log.info("All done!")
+    if args.cpld:
+        cpld = cpld_get_instance(dev_serial, cpld_profile)
+        cpld.normal_mode()
+        cpld.reset()
+    else:
+        log.info("You might need to reboot your board")
 
 
 def send_data_with_progress(data, conn: serial.Serial, print_progress=True):
@@ -310,6 +341,52 @@ def get_srec_load_addr(fname):
     raise Exception(f"Could not read srec load address (S3) from {fname}")
 
 
+# CPLD Code begins there
+try:
+    import pyftdi
+    cpld_available = True
+except ModuleNotFoundError:
+    log.error("pyftdi module not found. CPLD Functinality is disabled.")
+    log.error("   Please install the module.")
+    log.error("   You can try \"pip3 install --user pyftdi\"")
+    log.error(
+        "   Or use your favourite packet manager (\"apt install python3-ftdi\" perhaps?)"
+    )
+
+
+def cpld_determine_serial(cpld_profile, args) -> str:
+    import pyftdi.usbtools
+    # Try to determine USB device serial number where CPLD resides
+
+    # We are luck: user provided serial number
+    if args.cpld != "AUTO":
+        return args.cpld
+
+    # Try to make a best effort basing on CPLD profile
+    usb_vid = cpld_profile["usb_vid"]
+    usb_pid = cpld_profile["usb_pid"]
+    devices = pyftdi.usbtools.UsbTools.find_all([(usb_vid, usb_pid)])
+    if not devices:
+        raise Exception(
+            f"Could not find any USB devices with VID:PID = {usb_vid:04X}:{usb_pid:04X}"
+        )
+
+    if len(devices) > 1:
+        log.warning("Found more than one fitting device. Will use first one")
+    sn = devices[0][0].sn
+    log.info("Selected device with serial number %s", sn)
+
+    return sn
+
+
+def cpld_get_instance(dev_serial, cpld_profile):
+    if cpld_profile["protocol"] == "i2c":
+        cpld = cpld_i2c(dev_serial, cpld_profile)
+    elif cpld_profile["protocol"] == "spi":
+        cpld = cpld_spi(dev_serial, cpld_profile)
+    else:
+        raise Exception(f"Unknown CPLD protocol '{cpld_profile['protocol']}'")
+    return cpld
 
 
 class cpld_i2c:
