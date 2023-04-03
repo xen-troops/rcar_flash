@@ -252,10 +252,6 @@ def flash_one_loader(conn, fname, flash_addr, flash_target):
     conn_wait_for(conn, ">")
 
 
-def flash_one_loader_emmc(conn, fname, flash_addr):
-    pass
-
-
 def send_flashwriter(board_conf, fname: str, conn: serial.Serial):
     with open(fname, "rb") as f:
         data = f.read()
