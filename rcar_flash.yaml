@@ -63,6 +63,39 @@ flash_target:
         send: const
         val: "y"
 
+cpld_profiles:
+  s4:
+    protocol: i2c
+    usb_vid: 0x0403
+    usb_pid: 0x6010
+    dev_addr: 0xe0
+    revision:
+      reg: 0x0
+      expected: [0xF0, 0x79, 0xA7, 0xB8] # B8A7779F0
+    reset:
+      reg: 0x24
+      write: [0x01, 0x01]
+    serial_mode:
+      reg: 0x8
+      write: [0xBE, 0x20, 0x61, 0x00, 0x81, 0x00, 0x01, 0x00]
+    normal_mode:
+      reg: 0x8
+      write: [0xA8, 0x20, 0x61, 0x00, 0x81, 0x00, 0x01, 0x00]
+
+  ulcb:
+    protocol: spi
+    usb_vid: 0x0403
+    usb_pid: 0x6001
+    reset:
+      reg: 0x80
+      write: 0x1
+    serial_mode:
+      reg: 0x0
+      write: 0x802181fe
+    normal_mode:
+      reg: 0x0
+      write: 0x00218128
+
 board:
   e3_2x512:
     flash_writer: AArch64_Gen3_E3_Scif_MiniMon_develop_Ebisu_V0.02.mot
@@ -205,6 +238,7 @@ board:
   h3ulcb:
     flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
     sup_baud: 921600
+    cpld_profile: ulcb
     ipls:
       bootparam:
         file: bootparam_sa0.srec
@@ -233,6 +267,7 @@ board:
   h3ulcb_4x2:
     flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
     sup_baud: 921600
+    cpld_profile: ulcb
     ipls:
       bootparam:
         file: bootparam_sa0-4x2g.srec
@@ -373,6 +408,7 @@ board:
   s4:
     flash_writer: ICUMX_Flash_writer_SCIF_DUMMY_CERT_EB203000_S4.mot
     baud: 1843200
+    cpld_profile: s4
     ipls:
       cr52:
         file: App_CDD_ICCOM_S4_Sample_CR52.srec
