@@ -486,6 +486,89 @@ class cpld_i2c:
         for reg in reg_data:
             self._write_byte(reg)
         self._stop_cond()
+
+
+class cpld_spi:
+    CS_PIN = 0x8
+    MOSI_PIN = 0x40
+    MISO_PIN = 0x10
+    SCK_PIN = 0x04
+
+    def __init__(self, serial: str, profile: dict):
+        import pyftdi.gpio
+        gpio = pyftdi.gpio.GpioSyncController()
+        gpio.configure(f'ftdi://ftdi:232r:{serial}/1',
+                       direction=self.CS_PIN | self.MOSI_PIN | self.SCK_PIN,
+                       initial=0,
+                       frequency=57600)
+        self._gpio = gpio
+        self._profile = profile
+        self._sync()
+
+    def __del__(self):
+        self._gpio.close()
+
+    def reset(self):
+        self.write_cmd("reset")
+
+    def serial_mode(self):
+        self.write_cmd("serial_mode")
+
+    def normal_mode(self):
+        self.write_cmd("normal_mode")
+
+    def check_rev(self):
+        log.info("CPLD SPI protocol does not support revision check")
+
+    def write_cmd(self, cmd):
+        log.info("CPLD: Issuing command %s", cmd)
+        cmd_conf = self._profile[cmd]
+        reg_addr = cmd_conf["reg"]
+        reg_data = cmd_conf["write"]
+        self._write_reg(reg_addr, reg_data)
+
+    def _sleep(self):
+        time.sleep(0.00001)
+
+    def _prepare_write_byte(self, byte):
+        cmd = []
+        for i in range(7, -1, -1):
+            if byte & (1 << i):
+                mosi = self.MOSI_PIN
+            else:
+                mosi = 0
+            cmd.append(mosi | self.CS_PIN | self.SCK_PIN)
+            cmd.append(mosi | self.CS_PIN)
+        return cmd
+
+    def _sync(self):
+        cmd = [self.SCK_PIN, 0]
+        for _ in range(32):
+            cmd.append(self.CS_PIN | self.SCK_PIN)
+            cmd.append(self.CS_PIN)
+        cmd.append(self.CS_PIN | self.SCK_PIN | self.MOSI_PIN)
+        cmd.append(self.CS_PIN | self.MOSI_PIN)
+        self._gpio.exchange(cmd)
+        self._sleep()
+        cmd = self._prepare_write_byte(0xfe)
+        cmd.append(self.SCK_PIN | self.MOSI_PIN)
+        cmd.append(self.MOSI_PIN)
+        self._gpio.exchange(cmd)
+
+    def _write_reg(self, addr, reg):
+        cmd = [self.SCK_PIN, 0]
+        for i in range(3, -1, -1):
+            cmd.extend(self._prepare_write_byte(reg >> (i * 8)))
+
+        self._gpio.exchange(cmd)
+        self._sleep()
+
+        cmd = self._prepare_write_byte(addr)
+        cmd.append(self.MOSI_PIN | self.SCK_PIN)
+        cmd.append(self.MOSI_PIN)
+        self._gpio.exchange(cmd)
+
+
 if __name__ == "__main__":
     try:
         main()
