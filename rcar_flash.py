@@ -310,6 +310,182 @@ def get_srec_load_addr(fname):
     raise Exception(f"Could not read srec load address (S3) from {fname}")
 
 
+
+
+class cpld_i2c:
+    SDA_PIN = 1 << 7
+    SCL_PIN = 1 << 6
+    STATE_LOW = -1
+    STATE_HIGH = 1
+    STATE_SAME = 0
+
+    def __init__(self, serial: str, profile: dict):
+        import pyftdi.gpio
+        gpio = pyftdi.gpio.GpioAsyncController()
+        gpio.configure(f'ftdi://ftdi:2232h:{serial}/2', direction=0, initial=0)
+        self._gpio = gpio
+        self._profile = profile
+        self._devaddr = profile["dev_addr"]
+
+    def __del__(self):
+        self._gpio.close()
+
+    def reset(self):
+        self.write_cmd("reset")
+
+    def serial_mode(self):
+        self.write_cmd("serial_mode")
+
+    def normal_mode(self):
+        self.write_cmd("normal_mode")
+
+    def check_rev(self):
+        if "revision" not in self._profile:
+            log.info("CPLD profile does not provide means to check revision")
+            return
+        log.info("CPLD: Checking revision")
+        cmd_conf = self._profile["revision"]
+        reg_addr = cmd_conf["reg"]
+        expected_rev = cmd_conf["expected"]
+        revision: list = self._read_reg(self._devaddr, reg_addr,
+                                        len(expected_rev))
+        log.info("Read revision: %s",
+                 "".join([f"{x:02X}" for x in reversed(revision)]))
+        if expected_rev != revision:
+            raise Exception(
+                f"Board revision mismatch. Expected {expected_rev} got {revision}"
+            )
+
+    def write_cmd(self, cmd):
+        log.info("CPLD: Issuing command %s", cmd)
+        cmd_conf = self._profile[cmd]
+        reg_addr = cmd_conf["reg"]
+        reg_data = cmd_conf["write"]
+        self._write_regs(self._devaddr, reg_addr, reg_data)
+
+    def _sleep(self):
+        time.sleep(0.0001)
+
+    def _set_state(self, sda, scl):
+        # We rely on external pullup when we want to output HIGH state
+        direction = self._gpio.direction
+        pins = 0
+        if sda == self.STATE_LOW:
+            direction |= self.SDA_PIN
+            pins |= self.SDA_PIN
+        elif sda == self.STATE_HIGH:
+            direction &= ~self.SDA_PIN
+            pins |= self.SDA_PIN
+
+        if scl == self.STATE_LOW:
+            direction |= self.SCL_PIN
+            pins |= self.SCL_PIN
+        elif sda == self.STATE_HIGH:
+            direction &= ~self.SCL_PIN
+            pins |= self.SCL_PIN
+
+        self._gpio.set_direction(pins, direction)
+
+    def _get_state(self, read_sda, read_scl):
+        pins = 0
+        if read_sda:
+            pins |= self.SDA_PIN
+        if read_scl:
+            pins |= self.SCL_PIN
+        self._gpio.set_direction(pins, 0)
+        return self._gpio.read()
+
+    def _start_cond(self):
+        # Initial state
+        self._set_state(self.STATE_HIGH, self.STATE_HIGH)
+        self._wait_scl()
+
+        # Actual start condition - SDA goes low with SCL being high
+        self._set_state(self.STATE_LOW, self.STATE_HIGH)
+        self._sleep()
+
+    def _stop_cond(self):
+        # Previous state
+        self._set_state(self.STATE_LOW, self.STATE_HIGH)
+        self._sleep()
+        self._wait_scl()
+        self._sleep()
+        # Actual stop condition - SDA goes high while SCL being high
+        self._set_state(self.STATE_HIGH, self.STATE_HIGH)
+
+    def _wait_scl(self):
+        # Wait while SCL becomes HIGH
+        while self._get_state(False, True) & self.SCL_PIN == 0:
+            pass
+
+    def _write_bit(self, bit):
+        if bit:
+            self._set_state(self.STATE_HIGH, self.STATE_LOW)
+        else:
+            self._set_state(self.STATE_LOW, self.STATE_LOW)
+
+        self._set_state(self.STATE_SAME, self.STATE_HIGH)
+        self._sleep()
+        self._wait_scl()
+        self._set_state(self.STATE_SAME, self.STATE_LOW)
+        self._sleep()
+
+    def _read_bit(self):
+        self._set_state(self.STATE_HIGH, self.STATE_LOW)
+        self._sleep()
+        self._set_state(self.STATE_HIGH, self.STATE_HIGH)
+        self._sleep()
+        self._wait_scl()
+        data = self._get_state(True, False) & self.SDA_PIN
+        self._set_state(self.STATE_HIGH, self.STATE_LOW)
+        self._sleep()
+        return 1 if data else 0
+
+    def _write_byte(self, byte):
+        log.debug("I2C: Write byte: %02X", byte)
+        for i in range(7, -1, -1):
+            self._write_bit(byte & (1 << i))
+        ack = self._read_bit()
+        if ack != 0:
+            raise Exception("Got NAK during CPLD communication")
+
+    def _read_byte(self, ack):
+        ret = 0
+
+        for i in range(7, -1, -1):
+            ret |= self._read_bit() << i
+
+        self._write_bit(ack)
+        return ret
+
+    def _read_reg(self, dev_addr, reg_addr, reg_len):
+        self._start_cond()
+        self._write_byte(dev_addr & 0xFE)
+
+        self._write_byte(reg_addr >> 8)
+        self._write_byte(reg_addr & 0xFF)
+
+        self._start_cond()
+        self._write_byte(dev_addr | 0x1)
+
+        ret = []
+        for i in range(reg_len):
+            data = self._read_byte(i == reg_len - 1)
+            log.debug("I2C read: 0x%X", data)
+            ret.append(data)
+        self._stop_cond()
+        return ret
+
+    def _write_regs(self, dev_addr, reg_addr, reg_data):
+        self._start_cond()
+        self._write_byte(dev_addr & 0xFE)
+
+        self._write_byte(reg_addr >> 8)
+        self._write_byte(reg_addr & 0xFF)
+
+        for reg in reg_data:
+            self._write_byte(reg)
+        self._stop_cond()
 if __name__ == "__main__":
     try:
         main()
