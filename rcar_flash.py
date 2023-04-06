@@ -362,6 +362,17 @@ def cpld_determine_serial(cpld_profile, args) -> str:
     if args.cpld != "AUTO":
         return args.cpld
 
+    # If the exact serial number of the port is not specified for CPLD
+    # then we have the following steps for automatic detection:
+    # 1. list USB devices with VID:PID provided in the CPLD profile,
+    #    if only one device is found - let's use it;
+    # 2. if more than one devices are present with the same VID:PID
+    #    and we have a device specified by user (e.g.: -s /dev/ttyUSB*)
+    #    then we will try to get a serial number for that user-provided
+    #    device, if it has requested VID:PID;
+    # 3. if nothing works - print out the list of found devices with
+    #    the required VID:PID and ask the user to select one.
+
     # Try to make a best effort basing on CPLD profile
     usb_vid = cpld_profile["usb_vid"]
     usb_pid = cpld_profile["usb_pid"]
@@ -371,12 +382,28 @@ def cpld_determine_serial(cpld_profile, args) -> str:
             f"Could not find any USB devices with VID:PID = {usb_vid:04X}:{usb_pid:04X}"
         )
 
-    if len(devices) > 1:
-        log.warning("Found more than one fitting device. Will use first one")
-    sn = devices[0][0].sn
-    log.info("Selected device with serial number %s", sn)
+    if len(devices) == 1:
+        # see case 1 above
+        return devices[0][0].sn
 
-    return sn
+    if len(devices) > 1 and args.serial:
+        # see case 2 above
+        for serial_port in serial.tools.list_ports.comports(include_links = True):
+            if serial_port.device == args.serial and serial_port.serial_number:
+                for device in devices:
+                    if device[0].sn == serial_port.serial_number:
+                        log.info(f"Will use {serial_port.device} --> {serial_port.serial_number}")
+                        return serial_port.serial_number
+
+    # see case 3 above
+    log.info(f"Multiple devices are available with VID:PID = {usb_vid:04X}:{usb_pid:04X}")
+    for device in devices:
+        log.info(f"{device[0].sn}:  {device[0].description}")
+    log.info(f"Please specify exactly which one to use, with option '--cpld XXXXXXXX'.")
+
+    raise Exception(
+        "Could not find suitable device."
+        )
 
 
 def cpld_get_instance(dev_serial, cpld_profile):
