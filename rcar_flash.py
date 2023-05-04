@@ -257,7 +257,7 @@ def send_data_with_progress(data, conn: serial.Serial, print_progress=True):
         conn.write(data[bytes_sent : bytes_sent+to_send])
         bytes_sent += to_send
         if print_progress:
-            print(f"{bytes_sent}/{total}", end="\r")
+            print(f"{bytes_sent:_}/{total:_} ({bytes_sent * 100 // total}%)", end="\r")
     if print_progress:
         # send "newline char" to start further output on the new line
         print("")
