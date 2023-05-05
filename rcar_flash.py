@@ -270,6 +270,8 @@ def flash_one_loader(conn, fname, flash_addr, flash_target):
         conn_wait_for(conn, evt["wait_for"])
         if evt["send"] == "img_addr":
             conn_send(conn, f"{get_srec_load_addr(fname)}\r")
+        elif evt["send"] == "file_size":
+            conn_send(conn, f"{os.path.getsize(fname):X}\r")
         elif evt["send"] == "flash_addr":
             conn_send(conn, f"{flash_addr:X}\r")
         elif evt["send"] == "const":
