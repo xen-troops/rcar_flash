@@ -269,6 +269,9 @@ Allowed arguments for `send` are:
 - `const` - send constant string defined in `val` field
 - `img_addr` - send the image (load) address. This address is
   determined by parsing `.srec` header of the file.
+- `file_size` - send the size of the binary file. It is obtained
+   by the script automatically. Can be used for binary files only.
+   See the "Work with binary files" section below.
 - `flash_add` - send the flash (store) address. This address is read
   from corresponding `ipl` entry (check out next parts of the
   documentation).
@@ -340,3 +343,46 @@ For each board there are multiple options possible:
       previous sections. This option is per-loader, not per-board
       because some boards (like `spider`) can have different targets for
       different loaders.
+
+### Work with binary files
+
+In case of need, you can flash not only .srec-files but also binaries.
+For this, you should use a slightly modified `flash_target`:
+
+- replace `xls2` with `xls3`
+
+- replace `img_addr` with `file_size`
+
+- replace `"please send ! ('.' & CR stop load)"` with `"please send ! (binary)"`
+
+- provide corresponding .bin-files in the list of the loaders for the board
+
+Please see below an example of the flash_target that allows flashing binary
+files to HyperFlash on H3ULCB board:
+
+```
+flash_target:
+  gen3_hf_bin:
+    sequence:
+      - wait_for: ">"
+        send: const
+        val: "xls3\r"
+      - wait_for: "(1-3)>"
+        send: const
+        val: "3\r"
+      - wait_for: "(Push Y key)"
+        send: const
+        val: "Y"
+      - wait_for: "(Push Y key)"
+        send: const
+        val: "Y"
+      - wait_for: "Please Input : H'"
+        send: file_size
+      - wait_for: "Please Input : H'"
+        send: flash_addr
+      - wait_for: "please send ! (binary)"
+        send: file
+      - wait_for: "(y/n)"
+        send: const
+        val: "y"
+```
