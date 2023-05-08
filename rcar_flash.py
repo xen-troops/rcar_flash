@@ -11,6 +11,7 @@ import pathlib
 import traceback
 import time
 from typing import List
+from string import printable
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
@@ -252,6 +253,10 @@ def do_flash(conf, args):
 def send_data_with_progress(data, conn: serial.Serial, print_progress=True):
     bytes_sent = 0
     total = len(data)
+    if print_progress:
+        # start output of the progress from the new line
+        # to avoid overwriting of the previous info in some cases
+        print("")
     while bytes_sent < total:
         to_send = min(total-bytes_sent, 10*1024)
         conn.write(data[bytes_sent : bytes_sent+to_send])
@@ -324,10 +329,15 @@ def open_connection(board_conf, args, use_sup=False):
 
 
 def conn_wait_for(conn, expect: str):
-    data = conn.read_until(expect.encode('ascii')).decode('ascii')
-    print(data)
-    if expect not in data:
-        raise Exception(f"Timeout waiting for `{expect}` from the device")
+    rcv_str = ""
+    while expect not in rcv_str:
+        data = conn.read(1)
+        if not data:
+            raise TimeoutError(f"Timeout waiting for `{expect}` from the device")
+        rcv_char = chr(data[0])
+        if rcv_char in printable or rcv_char == '\b':
+            print(rcv_char, end='', flush=True)
+        rcv_str += rcv_char
 
 
 def conn_send(conn, data):
