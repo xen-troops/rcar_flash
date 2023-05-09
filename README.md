@@ -262,7 +262,7 @@ HyperFlash or eMMC. Those "programs" are simple lists of "wait-for" -
 
 This example describes how to flash QSPI on s4/spider
 board. `rcar_flash` will wait for ">", then send "xls2", then wait for
-"(1-3)" message, chose option "1" and so on...
+"(1-3)" message, choose option "1" and so on...
 
 Allowed arguments for `send` are:
 
@@ -272,7 +272,7 @@ Allowed arguments for `send` are:
 - `file_size` - send the size of the binary file. It is obtained
    by the script automatically. Can be used for binary files only.
    See the "Work with binary files" section below.
-- `flash_add` - send the flash (store) address. This address is read
+- `flash_addr` - send the flash (store) address. This address is read
   from corresponding `ipl` entry (check out next parts of the
   documentation).
 - `file` - send the bootloader file
@@ -337,8 +337,8 @@ For each board there are multiple options possible:
 - `ipls` - mandatory - list of bootloaders that can be flashed to this
   board. Each entry should have the following options:
     - `file` - default file name for said bootloader
-	- `flash_addr` - address in flash memory where to write this bootloader
-	- `flash_target` - which "flash_target" to use while writing this
+    - `flash_addr` - address in flash memory where to write this bootloader
+    - `flash_target` - which "flash_target" to use while writing this
       bootloader. Flash targets are described in the one of the
       previous sections. This option is per-loader, not per-board
       because some boards (like `spider`) can have different targets for
