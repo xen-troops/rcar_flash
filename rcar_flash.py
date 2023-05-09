@@ -271,8 +271,16 @@ def send_data_with_progress(data, conn: serial.Serial, print_progress=True):
 def flash_one_loader(conn, fname, flash_addr, flash_target):
     conn_send(conn, "\r")
 
+    orig_timeout: int
     for evt in flash_target["sequence"]:
+        if "timeout" in evt:
+            # set required timeout
+            orig_timeout = conn.timeout
+            conn.timeout = evt["timeout"]
         conn_wait_for(conn, evt["wait_for"])
+        if "timeout" in evt:
+            # restore original timeout
+            conn.timeout = orig_timeout
         if evt["send"] == "img_addr":
             conn_send(conn, f"{get_srec_load_addr(fname)}\r")
         elif evt["send"] == "file_size":

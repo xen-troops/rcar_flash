@@ -286,6 +286,18 @@ Allowed arguments for `send` are:
   documentation).
 - `file` - send the bootloader file
 
+Also in some specific cases, like flashing of big files, flash_writer
+may be silent for 30 seconds or longer. In this case, you should
+use the optional command `timeout`, providing a safe timeout in seconds.
+Like this:
+
+      - wait_for: "complete!"
+        timeout: 40
+        send: const
+        val: "\r"
+
+Specified timeout will be used only for mentioned `wait_for`.
+
 #### `cpld_profiles`
 
 This section defines how to communicate with CPLD and which registers
