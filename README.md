@@ -122,6 +122,15 @@ available for your board with the following command:
 
 ## Reference manual
 
+### Select configuration file
+
+By default `rcar_flash` reads all required data from shipped `rcar_flash.yaml`
+file. But you may provide your own file, using the option `--conf`:
+
+```
+# ./rcar_flash.py --conf my_config.yaml
+```
+
 ### `list-boards` sub-command
 
 This command is used to list all supported boards. It has no
