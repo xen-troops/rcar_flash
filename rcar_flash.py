@@ -159,7 +159,12 @@ def do_flash(conf, args):
                 if not os.path.exists(loaders[k]):
                     raise Exception(
                         f"File {loaders[k]} for loader {k} does not exists!")
-
+        elif l == "none":
+            # "none" is used when you need to upload flash_writer only
+            # without any flashing of loaders
+            if len(args.loaders) > 1:
+                raise Exception(
+                    "You can't use 'none' with any loader")
         else:
             if ':' in l:
                 idx = l.index(":")
@@ -242,7 +247,9 @@ def do_flash(conf, args):
     conn.close()
 
     log.info("All done!")
-    if args.cpld:
+    # loaders are empty if user specified "none" and this means
+    # that user wants to work with flash_writer, so we do not reset port
+    if args.cpld and loaders:
         cpld = cpld_get_instance(dev_serial, cpld_profile)
         cpld.normal_mode()
         cpld.reset()

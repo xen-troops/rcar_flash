@@ -407,3 +407,23 @@ flash_target:
         send: const
         val: "y"
 ```
+
+### Run flash_writer only
+
+It is possible to load flash_writer only without flashing any loader.
+This may be useful if someone wants to work with flash_writer commands.
+In this case, you may specify `none` as the list of required loaders.
+In the following example, `rcar_flash` will use CPLD to switch the board
+to the download mode, load flash_writer specified for h3ulcb_4x2, and stop.
+After that, you may open your serial port and work with flash_writer.
+
+```
+sudo ./rcar_flash.py flash -c -f -b h3ulcb_4x2 -s /dev/ttyUSB0 none
+```
+
+Pay attention to the speed of the serial console. If the board supports
+SUP, then `sup_baud` will be used after loading the flash_writer.
+You may identify this by the message like
+```
+[INFO] Using serial port /dev/ttyUSB0 with baudrate 921600
+```
