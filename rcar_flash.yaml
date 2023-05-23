@@ -98,7 +98,7 @@ cpld_profiles:
 
 board:
   e3_2x512:
-    flash_writer: AArch64_Gen3_E3_Scif_MiniMon_develop_Ebisu_V0.02.mot
+    flash_writer: mot/AArch64_Gen3_E3_Scif_MiniMon_develop_Ebisu_V0.02.mot
     ipls:
       bootparam:
         file: bootparam_sa0.srec
@@ -125,7 +125,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   e3_4x512:
-    flash_writer: AArch64_Gen3_E3-4D_Scif_MiniMon_V5.03A.mot
+    flash_writer: mot/AArch64_Gen3_E3-4D_Scif_MiniMon_V5.03A.mot
     ipls:
       bootparam:
         file: bootparam_sa0-4d.srec
@@ -152,7 +152,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3_2x2:
-    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    flash_writer: mot/AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
     sup_baud: 921600
     ipls:
       bootparam:
@@ -180,7 +180,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3_4x1:
-    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    flash_writer: mot/AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
     sup_baud: 921600
     ipls:
       bootparam:
@@ -208,7 +208,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3_4x2:
-    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
+    flash_writer: mot/AArch64_Gen3_H3_M3_Scif_MiniMon_V3.03.mot
     sup_baud: 921600
     ipls:
       bootparam:
@@ -236,7 +236,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3ulcb:
-    flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    flash_writer: mot/AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
     sup_baud: 921600
     cpld_profile: ulcb
     ipls:
@@ -265,7 +265,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3ulcb_4x2:
-    flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    flash_writer: mot/AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
     sup_baud: 921600
     cpld_profile: ulcb
     ipls:
@@ -294,7 +294,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   m3:
-    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
+    flash_writer: mot/AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
     sup_baud: 921600
     ipls:
       bootparam:
@@ -322,7 +322,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   m3_2x4:
-    flash_writer: AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
+    flash_writer: mot/AArch64_Gen3_H3_M3_Scif_MiniMon_V5.11.mot
     sup_baud: 921600
     ipls:
       bootparam:
@@ -350,7 +350,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   m3n:
-    flash_writer: AArch64_Gen3_Scif_MiniMon_Develop_M3N_V0.03.mot
+    flash_writer: mot/AArch64_Gen3_Scif_MiniMon_Develop_M3N_V0.03.mot
     sup_baud: 921600
     ipls:
       bootparam:
@@ -378,7 +378,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   m3ulcb:
-    flash_writer: AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
+    flash_writer: mot/AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
     sup_baud: 921600
     ipls:
       bootparam:
@@ -406,7 +406,7 @@ board:
         flash_addr: 0x640000
         flash_target: gen3_hf
   s4:
-    flash_writer: ICUMX_Flash_writer_SCIF_DUMMY_CERT_EB203000_S4.mot
+    flash_writer: mot/ICUMX_Flash_writer_SCIF_DUMMY_CERT_EB203000_S4.mot
     baud: 1843200
     cpld_profile: s4
     ipls:
