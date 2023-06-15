@@ -427,3 +427,42 @@ You may identify this by the message like
 ```
 [INFO] Using serial port /dev/ttyUSB0 with baudrate 921600
 ```
+
+## Board-specific instructions
+
+### Salvator-X(S)
+
+Salvator X(S) boards have no CPLD so it is impossible to set boot mode
+automatically. Thus, fully automated mode is impossible. User has two
+choices: either boot into MiniMonitor, as described in Salvator HW manual
+or Yocto Startup Guide, or boot into Serial Download mode. Booting
+into serial download mode is easier, because fewer DIP switches need
+to be changed.
+
+To boot into download mode on your Salvator X(S) board do the following:
+
+1. Turn off your board.
+2. Locate SW10 DIP switches. They are positioned near the RGB
+   connector, on the top side of the board.
+3. Remember position of pins 5-8. You will need to set them back after
+   flashing. In most cases they are set as following: ON, ON, OFF, ON,
+   but your config may be different.
+4. Configure serial download mode by setting pins 5-8 of SW10:
+
+| Pin | Value |
+|-----|-------|
+| 5   | OFF   |
+| 6   | OFF   |
+| 7   | OFF   |
+| 8   | OFF   |
+
+5. Turn on your Salvator.
+6. Upload your bootloaders:
+
+```
+sudo ./rcar_flash.py flash -f -b h3_4x2 -s /dev/ttyUSB0 all
+```
+
+7. Power off the board again.
+8. Return pins 5-8 of SW10 back to original values from step 3.
+9. Power on your board back.
