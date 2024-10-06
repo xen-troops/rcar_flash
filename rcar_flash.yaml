@@ -454,3 +454,40 @@ board:
         flash_target: s4_emmc
         file: u-boot-elf.srec
         flash_addr: 0x7C00
+  v4h:
+    flash_writer: mot/ICUMX_Flash_writer_SCIF_DUMMY_CERT_EB203000_V4H.mot
+    baud: 921600
+    # cpld_profile: not available
+    ipls:
+      bootparam:
+        file: bootparam_sa0.srec
+        flash_target: s4_qspi
+        flash_addr: 0x0
+      icumx_loader:
+        file: icumx_loader.srec
+        flash_target: s4_qspi
+        flash_addr: 0x40000
+      cert_header:
+        file: cert_header_sa9.srec
+        flash_target: s4_qspi
+        flash_addr: 0x240000
+      dummy_fw:
+        file: dummy_fw.srec
+        flash_target: s4_qspi
+        flash_addr: 0x280000
+      cr52:
+        file: cr52_loader.srec
+        flash_target: s4_qspi
+        flash_addr: 0x480000
+      bl31:
+        file: bl31-whitehawk.srec
+        flash_target: s4_emmc
+        flash_addr: 0xA000
+      u-boot:
+        file: u-boot-elf-whitehawk.srec
+        flash_target: s4_emmc
+        flash_addr: 0xAC00
+      dummy_rtos:
+        file: dummy_rtos.srec
+        flash_target: s4_emmc
+        flash_addr: 0x0000

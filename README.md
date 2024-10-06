@@ -151,6 +151,7 @@ additional parameters. Example:
     m3n                 AArch64_Gen3_Scif_MiniMon_Develop_M3N_V0.03.mot
     m3ulcb              AArch32_Flash_writer_SCIF_DUMMY_CERT_E6300400_ULCB.mot
     s4                  ICUMX_Flash_writer_SCIF_DUMMY_CERT_EB203000_S4.mot
+    v4h                 ICUMX_Flash_writer_SCIF_DUMMY_CERT_EB203000_V4H.mot
 
 ### `list-loaders` sub-command
 
@@ -465,4 +466,35 @@ sudo ./rcar_flash.py flash -f -b h3_4x2 -s /dev/ttyUSB0 all
 
 7. Power off the board again.
 8. Return pins 5-8 of SW10 back to original values from step 3.
+9. Power on your board back.
+
+### Whitehawk V4H
+
+Whitehawk V4h has no CPLD so it is impossible to set boot mode
+automatically. User has to boot the board into Serial Download mode
+before flashing according to the following instruction:
+
+1. Turn off your board.
+2. Locate SW1 DIP switches. They are located on the small red board,
+   in the row near the serial number, closer to the SOC.
+3. Remember position of pins 5-8. You will need to set them back after
+   flashing.
+4. Configure serial download mode by setting pins 5-8 of SW1 to OFF position:
+
+| Pin | Value |
+|-----|-------|
+| 5   | OFF   |
+| 6   | OFF   |
+| 7   | OFF   |
+| 8   | OFF   |
+
+5. Turn on your board.
+6. Upload your bootloaders:
+
+```
+./rcar_flash.py flash -f -b v4h -s /dev/ttyUSB0 all
+```
+
+7. Power off the board again.
+8. Return pins 5-8 of SW1 back to original values from step 3.
 9. Power on your board back.
