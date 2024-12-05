@@ -171,7 +171,7 @@ def do_flash(conf, args):
                 ipl_name = l[:idx]
                 if ipl_name not in board["ipls"]:
                     raise Exception(f"Unknown loader name: {ipl_name}")
-                ipl_file = l[idx + 1:]
+                ipl_file = os.path.join(args.path, l[idx + 1:])
             else:
                 ipl_name = l
                 if ipl_name not in board["ipls"]:
