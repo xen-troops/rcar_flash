@@ -498,3 +498,35 @@ before flashing according to the following instruction:
 7. Power off the board again.
 8. Return pins 5-8 of SW1 back to original values from step 3.
 9. Power on your board back.
+
+## Examples
+
+List supported boards
+```
+./rcar_flash.py list-boards
+```
+
+List loaders for the specified board
+```
+./rcar_flash.py list-loaders -b <board>
+```
+
+Flash all loaders to the whitehawk (v4h) board that is already in flashing mode
+```
+./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> all
+```
+
+Flash only bl31 and u-boot to the whitehawk board
+```
+./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31 u-boot
+```
+
+Flash only bl31 that has non-default name to the whitehawk
+```
+./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31:my_bl31.srec u-boot
+```
+
+Flash all loaders to the spider (s4) board that supports CPLD to swith into the flashing mode
+```
+sudo ./rcar_flash.py flash -b s4 -c -f -s /dev/ttyUSB0 -p <path> all
+```
