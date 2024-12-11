@@ -13,6 +13,30 @@ It works by interacting with MiniMonitor/FlashWriter software running
 on the board via serial console. If you are tired of typing `xls2`
 commands into MiniMonitor again and again, this tool is for you.
 
+- [Quickstart](#quickstart)
+  - [Initial setup](#initial-setup)
+  - [Flashing your board](#flashing-your-board)
+    - [Choose your config](#choose-your-config)
+    - [Fully automated flashing with CPLD support](#fully-automated-flashing-with-cpld-support)
+    - [Flashing the board that is in MiniMonitor mode](#flashing-the-board-that-is-in-minimonitor-mode)
+    - [Flashing the board that is in serial download mode](#flashing-the-board-that-is-in-serial-download-mode)
+    - [Flashing only some bootloaders](#flashing-only-some-bootloaders)
+- [Reference manual](#reference-manual)
+  - [Select configuration file](#select-configuration-file)
+  - [`list-boards` sub-command](#list-boards-sub-command)
+  - [`list-loaders` sub-command](#list-loaders-sub-command)
+  - [`flash` sub-command](#flash-sub-command)
+  - [YAML file "schema"](#yaml-file-schema)
+    - [`flash_target`](#flash_target)
+    - [`cpld_profiles`](#cpld_profiles)
+    - [`board`](#board)
+  - [Work with binary files](#work-with-binary-files)
+  - [Run flash_writer only](#run-flash_writer-only)
+- [Board-specific instructions](#board-specific-instructions)
+  - [Salvator-X(S)](#salvator-xs)
+  - [Whitehawk V4H](#whitehawk-v4h)
+- [Examples](#examples)
+
 ## Quickstart
 
 ### Initial setup
@@ -498,3 +522,35 @@ before flashing according to the following instruction:
 7. Power off the board again.
 8. Return pins 5-8 of SW1 back to original values from step 3.
 9. Power on your board back.
+
+## Examples
+
+List supported boards
+```
+./rcar_flash.py list-boards
+```
+
+List loaders for the specified board
+```
+./rcar_flash.py list-loaders -b <board>
+```
+
+Flash all loaders to the whitehawk (v4h) board that is already in flashing mode
+```
+./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> all
+```
+
+Flash only bl31 and u-boot to the whitehawk board
+```
+./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31 u-boot
+```
+
+Flash only bl31 that has non-default name to the whitehawk
+```
+./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31:my_bl31.srec u-boot
+```
+
+Flash all loaders to the spider (s4) board that supports CPLD to swith into the flashing mode
+```
+sudo ./rcar_flash.py flash -b s4 -c -f -s /dev/ttyUSB0 -p <path> all
+```
