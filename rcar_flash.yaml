@@ -261,7 +261,7 @@ board:
         flash_addr: 0x200000
         flash_target: gen3_hf
       u-boot:
-        file: u-boot-elf.srec
+        file: u-boot-elf-h3ulcb.srec
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3ulcb_4x2:
@@ -290,7 +290,7 @@ board:
         flash_addr: 0x200000
         flash_target: gen3_hf
       u-boot:
-        file: u-boot-elf.srec
+        file: u-boot-elf-h3ulcb.srec
         flash_addr: 0x640000
         flash_target: gen3_hf
   m3:
