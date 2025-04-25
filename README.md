@@ -41,41 +41,44 @@ commands into MiniMonitor again and again, this tool is for you.
 
 ### Initial setup
 
-You need to perform a number of steps to make `rcar_flash` work on
-your machine. Basically, you need to clone the repository somewhere on
-your PC:
+Install `rcar_flash` directly from the GitHub repository:
 
 ```
-# git clone https://github.com/xen-troops/rcar_flash.git
+# pipx install git+https://github.com/xen-troops/rcar_flash.git
 ```
 
-And install two packages: `pyserial` and `pyftdi`. This depends on
-your Linux distribution, but for Ubuntu the following command should
-install pyserial:
+This will install the rcar_flash tool as a console command.
+
+Note: rcar_flash depends on the `pyftdi` library only if CPLD access is required (which applies only
+to H3ULCB and Spider 1.0 boards).
+
+If you need `pyftdi`, please follow the https://eblot.github.io/pyftdi/installation.html
+Depending on your Linux configuration, you might need to run rcar_flash as root to access your serial console device.
+
+Also You can simply clone the repository and run the tool directly without installing it:
 
 ```
-# sudo apt install python3-serial
+git clone https://github.com/xen-troops/rcar_flash.git
+cd rcar_flash
+./rcar_flash/rcar_flash.py --help
 ```
 
-As for `pyftdi` it is a little more trickier, so please check the
-pyftdi manual:
-<https://eblot.github.io/pyftdi/installation.html>. `pyftdi` required
-only if you are planning to use CPLD control functionality, but we are
-strongly suggest to install it.
-
-Depending on your Linux configuration, you might need to run
-`rcar_flash` as `root` to access your serial console device.
+Note: When running directly from source, make sure the following Python packages are installed:
+- `pyserial`
+- `PyYAML`
+- `pyftdi` (only if CPLD access is needed for H3ULCB or Spider 1.0)
 
 ### Flashing your board
 
 #### Choose your config
 
-Use
+Usage
+
+Once installed, you can run rcar_flash directly from the command line:
 
 ```
-# ./rcar_flash.py list-boards
+# rcar_flash list-boards
 ```
-
 to see list of all currently supported boards. Choose the most
 appropriate for you. If you are working with Starter Kit (ulcb) or
 Spider (s4) boards, you are in luck, because you can use CPLD to
@@ -87,7 +90,7 @@ The next command will try to flash all known loaders located at
 `<path-to-loader-files>` for board `<board-name>`.
 
 ```
-# ./rcar_flash.py flash -b <board-name> -c -f -p <path-to-loader-files> all
+# rcar_flash flash -b <board-name> -c -f -p <path-to-loader-files> all
 ```
 
 It will try to determine your board USB interface automatically, but
@@ -95,7 +98,7 @@ it might fail if there are multiple compatible USB devices connected
 to your PC. In this case you need to pass serial number for correct USB manually:
 
 ```
-# ./rcar_flash.py flash -b <board-name> -c <serial-no> -f -p <path-to-loader-files> all
+# rcar_flash flash -b <board-name> -c <serial-no> -f -p <path-to-loader-files> all
 ```
 
 
@@ -109,7 +112,7 @@ your board, for example
 flash all loaders to your board:
 
 ```
-# ./rcar_flash.py flash -b <board-name> -s /dev/ttyUSB0 -p <path-to-loader-files> all
+# rcar_flash flash -b <board-name> -s /dev/ttyUSB0 -p <path-to-loader-files> all
 ```
 
 Replace `/dev/ttyUSB0` with the correct USB serial port name. In this
@@ -126,7 +129,7 @@ your board, for example
 flash all loaders to your board:
 
 ```
-# ./rcar_flash.py flash -b <board-name> -s /dev/ttyUSB0 -f -p <path-to-loader-files> all
+# rcar_flash flash -b <board-name> -s /dev/ttyUSB0 -f -p <path-to-loader-files> all
 ```
 
 Replace `/dev/ttyUSB0` with the correct USB serial port name. In this
@@ -141,7 +144,7 @@ to flash only BL31, U-Boot and OP-TEE. You can get list of loaders
 available for your board with the following command:
 
 ```
-# ./rcar_flash list-loaders -b <board-name>
+# rcar_flash list-loaders -b <board-name>
 ```
 
 ## Reference manual
@@ -152,7 +155,7 @@ By default `rcar_flash` reads all required data from shipped `rcar_flash.yaml`
 file. But you may provide your own file, using the option `--conf`:
 
 ```
-# ./rcar_flash.py --conf my_config.yaml
+# rcar_flash --conf my_config.yaml
 ```
 
 ### `list-boards` sub-command
@@ -161,7 +164,7 @@ This command is used to list all supported boards. It has no
 additional parameters. Example:
 
 
-    # ./rcar_flash list-boards
+    # rcar_flash list-boards
     Board Name          Default flash loader file
     e3_2x512            AArch64_Gen3_E3_Scif_MiniMon_develop_Ebisu_V0.02.mot
     e3_4x512            AArch64_Gen3_E3-4D_Scif_MiniMon_V5.03A.mot
@@ -187,7 +190,7 @@ board. It has one mandatory argument:
 
 Example:
 
-    #  ./rcar_flash.py list-loaders -b s4
+    #  rcar_flash.py list-loaders -b s4
     [INFO] Reading config for board s4
     Loader                       Flash address       Default file                             Flash target
     ------------------------------------------------------------------------------------------------------
@@ -443,7 +446,7 @@ to the download mode, load flash_writer specified for h3ulcb_4x2, and stop.
 After that, you may open your serial port and work with flash_writer.
 
 ```
-sudo ./rcar_flash.py flash -c -f -b h3ulcb_4x2 -s /dev/ttyUSB0 none
+sudo rcar_flash flash -c -f -b h3ulcb_4x2 -s /dev/ttyUSB0 none
 ```
 
 Pay attention to the speed of the serial console. If the board supports
@@ -485,7 +488,7 @@ To boot into download mode on your Salvator X(S) board do the following:
 6. Upload your bootloaders:
 
 ```
-sudo ./rcar_flash.py flash -f -b h3_4x2 -s /dev/ttyUSB0 all
+sudo rcar_flash flash -f -b h3_4x2 -s /dev/ttyUSB0 all
 ```
 
 7. Power off the board again.
@@ -516,7 +519,7 @@ before flashing according to the following instruction:
 6. Upload your bootloaders:
 
 ```
-./rcar_flash.py flash -f -b v4h -s /dev/ttyUSB0 all
+sudo rcar_flash flash -f -b v4h -s /dev/ttyUSB0 all
 ```
 
 7. Power off the board again.
@@ -527,30 +530,30 @@ before flashing according to the following instruction:
 
 List supported boards
 ```
-./rcar_flash.py list-boards
+rcar_flash list-boards
 ```
 
 List loaders for the specified board
 ```
-./rcar_flash.py list-loaders -b <board>
+rcar_flash list-loaders -b <board>
 ```
 
 Flash all loaders to the whitehawk (v4h) board that is already in flashing mode
 ```
-./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> all
+rcar_flash flash -b v4h -f -s /dev/ttyUSB0 -p <path> all
 ```
 
 Flash only bl31 and u-boot to the whitehawk board
 ```
-./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31 u-boot
+rcar_flash flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31 u-boot
 ```
 
 Flash only bl31 that has non-default name to the whitehawk
 ```
-./rcar_flash.py flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31:my_bl31.srec u-boot
+rcar_flash flash -b v4h -f -s /dev/ttyUSB0 -p <path> bl31:my_bl31.srec u-boot
 ```
 
 Flash all loaders to the spider (s4) board that supports CPLD to swith into the flashing mode
 ```
-sudo ./rcar_flash.py flash -b s4 -c -f -s /dev/ttyUSB0 -p <path> all
+sudo rcar_flash flash -b s4 -c -f -s /dev/ttyUSB0 -p <path> all
 ```
