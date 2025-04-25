@@ -10,6 +10,7 @@ import pathlib
 import traceback
 import time
 from string import printable
+from importlib.resources import files
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ def main():
         '--conf',
         help='Name of config file. Default is "rcar_flash.yaml"',
         type=argparse.FileType('r'),
-        default='rcar_flash.yaml')
+        default=os.path.join(os.path.dirname(__file__), 'rcar_flash.yaml'))
 
     subparsers = parser.add_subparsers(required=True, dest="action")
 
@@ -221,12 +222,23 @@ def do_flash(conf, args):  # noqa: C901
     if args.flash_writer:
         if not args.cpld:
             log.info("Please ensure that board is in the serial download mode")
+
         if args.flash_writer == "DEFAULT":
-            fname = board["flash_writer"]
+            resource_name = board["flash_writer"]
         else:
-            fname = args.flash_writer
-        if not os.path.exists(fname):
-            raise Exception(f"Flash write file {fname} does not exists!")
+            resource_name = args.flash_writer
+
+        try:
+            resource_path = files("rcar_flash").joinpath(resource_name)
+        except Exception:
+            raise Exception(f"Flash writer file {resource_name} does not exist in package resources.")
+
+        if not resource_path.exists():
+            raise Exception(f"Flash writer file {resource_name} does not exist in package resources.")
+
+        fname = str(resource_path)
+        log.debug(f"Resolved flash_writer from package resources: {fname}")
+
         log.info(f"Sending flash writer file {fname}...")
         send_flashwriter(board, fname, conn)
         if "sup_baud" in board:
