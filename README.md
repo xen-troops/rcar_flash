@@ -42,8 +42,24 @@ commands into MiniMonitor again and again, this tool is for you.
 ### Initial setup
 
 You need to perform a number of steps to make `rcar_flash` work on
-your machine. Basically, you need to clone the repository somewhere on
-your PC:
+your machine.
+
+Option 1 (preferred installation method):
+Install the `rcar_flash` tool as a package using `pipx`:
+
+```
+pipx install git+https://github.com/xen-troops/rcar_flash.git
+```
+
+This will allow you to run the `rcar_flash` tool directly from the command line.
+For example:
+
+```
+rcar_flash -h
+```
+
+Option 2.
+You can to clone the repository somewhere on your PC:
 
 ```
 # git clone https://github.com/xen-troops/rcar_flash.git
