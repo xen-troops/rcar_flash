@@ -25,7 +25,7 @@ def main():
         '--conf',
         help='Name of config file. Default is "rcar_flash.yaml"',
         type=argparse.FileType('r'),
-        default='rcar_flash.yaml')
+        default=os.path.join(os.path.dirname(__file__), 'rcar_flash.yaml'))
 
     subparsers = parser.add_subparsers(required=True, dest="action")
 
@@ -218,12 +218,22 @@ def do_flash(conf, args):
     if args.flash_writer:
         if not args.cpld:
             log.info("Please ensure that board is in the serial download mode")
+        from importlib.resources import files
+
         if args.flash_writer == "DEFAULT":
-            fname = board["flash_writer"]
+            resource_name = board["flash_writer"]
         else:
-            fname = args.flash_writer
-        if not os.path.exists(fname):
-            raise Exception(f"Flash write file {fname} does not exists!")
+            resource_name = args.flash_writer
+
+        try:
+            fname = files("rcar_flash").joinpath(resource_name)
+            if not fname.exists():
+                raise FileNotFoundError
+            fname = str(fname)
+            log.info(f"Resolved flash_writer from package resources: {fname}")
+        except Exception:
+            raise Exception(f"Flash writer file {resource_name} does not exist in package resources!")
+
         log.info(f"Sending flash writer file {fname}...")
         send_flashwriter(board, fname, conn)
         if "sup_baud" in board:
