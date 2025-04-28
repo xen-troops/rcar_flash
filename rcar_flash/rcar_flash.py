@@ -88,6 +88,7 @@ def main():
         help='List of loaders to flash or "all" to flash all')
 
     args = parser.parse_args()
+    log.info(f"Using configuration file: {args.conf.name}")
 
     actions = {
         "list-loaders": do_list_loaders,
