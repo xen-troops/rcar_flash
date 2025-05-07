@@ -337,6 +337,9 @@ def open_connection(board_conf, args, use_sup=False):
         else:
             raise Exception(
                 f"Can't find device with serial number {serial_no}")
+
+    real_dev_name = os.path.realpath(dev_name)
+
     if use_sup and "sup_baud" in board_conf:
         # use SUP if requested and available
         baud = board_conf["sup_baud"]
@@ -345,8 +348,9 @@ def open_connection(board_conf, args, use_sup=False):
     else:
         baud = 115200
 
-    log.info(f"Using serial port {dev_name} with baudrate {baud}")
-    conn = serial.Serial(port=dev_name, baudrate=baud, timeout=20)
+    if dev_name != real_dev_name:
+        log.info(f"Using serial port {dev_name} → {real_dev_name} with baudrate {baud}")
+    conn = serial.Serial(port=real_dev_name, baudrate=baud, timeout=20)
     if conn.is_open:
         conn.close()
     conn.open()
