@@ -15,7 +15,6 @@ from string import printable
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
-cpld_available = False
 
 
 def main():
@@ -192,8 +191,15 @@ def do_flash(conf, args):
 
     # Check if need to nudge CPLD
     if args.cpld:
-        if not cpld_available:
-            raise Exception("pyftdi is not available")
+        try:
+            import pyftdi  # noqa: F401
+        except ModuleNotFoundError:
+            print(
+                "The pyftdi module is required for working with CPLD.\n"
+                "Please use 'sudo apt install python3-pyftdi' or the appropriate package manager."
+                )
+            sys.exit(1)
+
         if "cpld_profile" not in board:
             raise Exception(
                 "'cpld_profile' is not set for board, can't control CPLD")
@@ -213,6 +219,7 @@ def do_flash(conf, args):
         time.sleep(0.5)
         # Need to release port, so pyserial can use it
         del cpld
+        time.sleep(5.5) # Waiting for the recreation of /dev/ttyUSB* and the symlink
 
     conn = open_connection(board, args)
     # Upload flash writer if needed
@@ -381,19 +388,6 @@ def get_srec_load_addr(fname):
         if l.startswith("S3"):
             return l[4:12]
     raise Exception(f"Could not read srec load address (S3) from {fname}")
-
-
-# CPLD Code begins there
-try:
-    import pyftdi
-    cpld_available = True
-except ModuleNotFoundError:
-    log.error("pyftdi module not found. CPLD Functinality is disabled.")
-    log.error("   Please install the module.")
-    log.error("   You can try \"pip3 install --user pyftdi\"")
-    log.error(
-        "   Or use your favourite packet manager (\"apt install python3-ftdi\" perhaps?)"
-    )
 
 
 def cpld_determine_serial(cpld_profile, args) -> str:
