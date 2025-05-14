@@ -15,7 +15,6 @@ from string import printable
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
-cpld_available = False
 
 
 def main():
@@ -25,7 +24,7 @@ def main():
         '--conf',
         help='Name of config file. Default is "rcar_flash.yaml"',
         type=argparse.FileType('r'),
-        default='rcar_flash.yaml')
+        default=os.path.join(os.path.dirname(__file__), 'rcar_flash.yaml'))
 
     subparsers = parser.add_subparsers(required=True, dest="action")
 
@@ -89,6 +88,7 @@ def main():
         help='List of loaders to flash or "all" to flash all')
 
     args = parser.parse_args()
+    log.info(f"Using configuration file: {args.conf.name}")
 
     actions = {
         "list-loaders": do_list_loaders,
@@ -191,8 +191,15 @@ def do_flash(conf, args):
 
     # Check if need to nudge CPLD
     if args.cpld:
-        if not cpld_available:
-            raise Exception("pyftdi is not available")
+        try:
+            import pyftdi  # noqa: F401
+        except ModuleNotFoundError:
+            print(
+                "The pyftdi module is required for working with CPLD.\n"
+                "Please use 'sudo apt install python3-pyftdi' or the appropriate package manager."
+                )
+            sys.exit(1)
+
         if "cpld_profile" not in board:
             raise Exception(
                 "'cpld_profile' is not set for board, can't control CPLD")
@@ -212,18 +219,29 @@ def do_flash(conf, args):
         time.sleep(0.5)
         # Need to release port, so pyserial can use it
         del cpld
+        time.sleep(5.5) # Waiting for the recreation of /dev/ttyUSB* and the symlink
 
     conn = open_connection(board, args)
     # Upload flash writer if needed
     if args.flash_writer:
         if not args.cpld:
             log.info("Please ensure that board is in the serial download mode")
+        from importlib.resources import files
+
         if args.flash_writer == "DEFAULT":
-            fname = board["flash_writer"]
+            resource_name = board["flash_writer"]
         else:
-            fname = args.flash_writer
-        if not os.path.exists(fname):
-            raise Exception(f"Flash write file {fname} does not exists!")
+            resource_name = args.flash_writer
+
+        try:
+            fname = files("rcar_flash").joinpath(resource_name)
+            if not fname.exists():
+                raise FileNotFoundError
+            fname = str(fname)
+            log.info(f"Resolved flash_writer from package resources: {fname}")
+        except Exception:
+            raise Exception(f"Flash writer file {resource_name} does not exist in package resources!")
+
         log.info(f"Sending flash writer file {fname}...")
         send_flashwriter(board, fname, conn)
         if "sup_baud" in board:
@@ -326,6 +344,9 @@ def open_connection(board_conf, args, use_sup=False):
         else:
             raise Exception(
                 f"Can't find device with serial number {serial_no}")
+
+    real_dev_name = os.path.realpath(dev_name)
+
     if use_sup and "sup_baud" in board_conf:
         # use SUP if requested and available
         baud = board_conf["sup_baud"]
@@ -334,8 +355,9 @@ def open_connection(board_conf, args, use_sup=False):
     else:
         baud = 115200
 
-    log.info(f"Using serial port {dev_name} with baudrate {baud}")
-    conn = serial.Serial(port=dev_name, baudrate=baud, timeout=20)
+    if dev_name != real_dev_name:
+        log.info(f"Using serial port {dev_name} → {real_dev_name} with baudrate {baud}")
+    conn = serial.Serial(port=real_dev_name, baudrate=baud, timeout=20)
     if conn.is_open:
         conn.close()
     conn.open()
@@ -366,19 +388,6 @@ def get_srec_load_addr(fname):
         if l.startswith("S3"):
             return l[4:12]
     raise Exception(f"Could not read srec load address (S3) from {fname}")
-
-
-# CPLD Code begins there
-try:
-    import pyftdi
-    cpld_available = True
-except ModuleNotFoundError:
-    log.error("pyftdi module not found. CPLD Functinality is disabled.")
-    log.error("   Please install the module.")
-    log.error("   You can try \"pip3 install --user pyftdi\"")
-    log.error(
-        "   Or use your favourite packet manager (\"apt install python3-ftdi\" perhaps?)"
-    )
 
 
 def cpld_determine_serial(cpld_profile, args) -> str:
