@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import os
 import serial
 import serial.tools.list_ports
@@ -10,7 +9,6 @@ import argparse
 import pathlib
 import traceback
 import time
-from typing import List
 from string import printable
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
@@ -20,7 +18,7 @@ cpld_available = False
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Automatic RCar Gen3/Gen4 flash tool', )
+        description='Automatic RCar Gen3/Gen4 flash tool')
     parser.add_argument(
         '--conf',
         help='Name of config file. Default is "rcar_flash.yaml"',
@@ -32,13 +30,13 @@ def main():
     parser_flash = subparsers.add_parser(
         name="flash",
         help="Flash loaders onto a board",
-        epilog=
-        'Each loader has format loader_name[:file_name], by default file name is taken from YAML configuration file'
+        epilog='Each loader has format loader_name[:file_name], by default file name'
+        'is taken from YAML configuration file'
     )
     parser_list_loaders = subparsers.add_parser(
         name="list-loaders", help="List supported loaders for a board")
-    parser_list_boards = subparsers.add_parser(name="list-boards",
-                                               help="List supported boards")
+    subparsers.add_parser(name="list-boards",
+                          help="List supported boards")
     parser_flash.add_argument(
         '-c',
         '--cpld',
@@ -48,7 +46,8 @@ def main():
         type=str,
         default=None,
         const="AUTO",
-        help='Use CPLD tool to automatically switch a board to a flash mode')
+        help='Use CPLD tool to automatically switch a board to a flash mode'
+    )
 
     parser_flash.add_argument(
         '-f',
@@ -58,8 +57,7 @@ def main():
         type=str,
         default=None,
         const="DEFAULT",
-        help=
-        'Upload Flash Writer before trying to flash a board. Default name is read from YAML configuration file'
+        help='Upload Flash Writer before trying to flash a board. Default name is read from YAML configuration file'
     )
 
     parser_flash.add_argument('-p',
@@ -124,14 +122,16 @@ def do_list_loaders(conf, args):
     print(header)
     print("-" * len(header))
     ipls = board["ipls"]
-    loaders = [(x, f'0x{ipls[x]["flash_addr"]:x}', ipls[x]["file"],
-                ipls[x]["flash_target"]) for x in ipls.keys()]
+    loaders = [
+        (x, f'0x{ipls[x]["flash_addr"]:x}', ipls[x]["file"], ipls[x]["flash_target"])
+        for x in ipls.keys()
+    ]
     # Sort twice. First time by address...
     loaders.sort(key=lambda x: int(x[1], 16))
     # And second time - by "flash_target" attribute
     loaders.sort(key=lambda x: x[3])
-    for l in loaders:
-        print(row_format.format(*l))
+    for loader in loaders:
+        print(row_format.format(*loader))
 
 
 def do_list_boards(conf, args):
@@ -142,15 +142,15 @@ def do_list_boards(conf, args):
         print(row_format.format(b, conf["board"][b]["flash_writer"]))
 
 
-def do_flash(conf, args):
+def do_flash(conf, args):  # noqa: C901
     board = get_board(conf, args.board)
 
     # Do some sanity checks before tring to flash anything
     # Build list of loaders
     loaders: dict[str, str] = dict()
-    l: str
-    for l in args.loaders:
-        if l == "all":
+    loader_arg: str
+    for loader_arg in args.loaders:
+        if loader_arg == "all":
             if len(args.loaders) > 1:
                 raise Exception(
                     "You can either use 'all' or define list of loaders")
@@ -159,21 +159,21 @@ def do_flash(conf, args):
                 if not os.path.exists(loaders[k]):
                     raise Exception(
                         f"File {loaders[k]} for loader {k} does not exists!")
-        elif l == "none":
+        elif loader_arg == "none":
             # "none" is used when you need to upload flash_writer only
             # without any flashing of loaders
             if len(args.loaders) > 1:
                 raise Exception(
                     "You can't use 'none' with any loader")
         else:
-            if ':' in l:
-                idx = l.index(":")
-                ipl_name = l[:idx]
+            if ':' in loader_arg:
+                idx = loader_arg.index(":")
+                ipl_name = loader_arg[:idx]
                 if ipl_name not in board["ipls"]:
                     raise Exception(f"Unknown loader name: {ipl_name}")
-                ipl_file = os.path.join(args.path, l[idx + 1:])
+                ipl_file = os.path.join(args.path, loader_arg[idx + 1:])
             else:
-                ipl_name = l
+                ipl_name = loader_arg
                 if ipl_name not in board["ipls"]:
                     raise Exception(f"Unknown loader name: {ipl_name}")
                 ipl_file = os.path.join(args.path,
@@ -185,8 +185,8 @@ def do_flash(conf, args):
 
     log.info("We are going to flash the following loaders")
     log.info("---")
-    for l in loaders.keys():
-        log.info(f"{l:24} : {loaders[l]}")
+    for loader_name in loaders.keys():
+        log.info(f"{loader_name:24} : {loaders[loader_name]}")
     log.info("---")
 
     # Check if need to nudge CPLD
@@ -269,7 +269,7 @@ def send_data_with_progress(data, conn: serial.Serial, print_progress=True):
         print("")
     while bytes_sent < total:
         to_send = min(total-bytes_sent, 10*1024)
-        conn.write(data[bytes_sent : bytes_sent+to_send])
+        conn.write(data[bytes_sent:bytes_sent+to_send])
         bytes_sent += to_send
         if print_progress:
             print(f"{bytes_sent:_}/{total:_} ({bytes_sent * 100 // total}%)", end="\r")
@@ -365,15 +365,15 @@ def conn_send(conn, data):
 def get_srec_load_addr(fname):
     with open(fname, "r") as f:
         lines = f.readlines()
-    for l in lines[:20]:
-        if l.startswith("S3"):
-            return l[4:12]
+    for line in lines[:20]:
+        if line.startswith("S3"):
+            return line[4:12]
     raise Exception(f"Could not read srec load address (S3) from {fname}")
 
 
 # CPLD Code begins there
 try:
-    import pyftdi
+    import pyftdi  # noqa: F401
     cpld_available = True
 except ModuleNotFoundError:
     log.error("pyftdi module not found. CPLD Functinality is disabled.")
@@ -418,7 +418,7 @@ def cpld_determine_serial(cpld_profile, args) -> str:
 
     if len(devices) > 1 and args.serial:
         # see case 2 above
-        for serial_port in serial.tools.list_ports.comports(include_links = True):
+        for serial_port in serial.tools.list_ports.comports(include_links=True):
             if serial_port.device == args.serial and serial_port.serial_number:
                 for device in devices:
                     if device[0].sn == serial_port.serial_number:
@@ -429,7 +429,7 @@ def cpld_determine_serial(cpld_profile, args) -> str:
     log.info(f"Multiple devices are available with VID:PID = {usb_vid:04X}:{usb_pid:04X}")
     for device in devices:
         log.info(f"{device[0].sn}:  {device[0].description}")
-    log.info(f"Please specify exactly which one to use, with option '--cpld XXXXXXXX'.")
+    log.info("Please specify exactly which one to use, with option '--cpld XXXXXXXX'.")
 
     raise Exception(
         "Could not find suitable device."
