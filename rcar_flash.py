@@ -212,6 +212,9 @@ def do_flash(conf, args):
         time.sleep(0.5)
         # Need to release port, so pyserial can use it
         del cpld
+        # Let's give some time for the proper recreation
+        # of the serial device and possible udev links
+        time.sleep(1)
 
     conn = open_connection(board, args)
     # Upload flash writer if needed
