@@ -57,14 +57,15 @@ install pyserial:
 # sudo apt install python3-serial
 ```
 
+You need to have the proper rights for access to serial devices
+like `/dev/ttyUSB0`. As a general recommendation, a user has to
+be added to the `dialout` group.
+
 As for `pyftdi` it is a little more trickier, so please check the
-pyftdi manual:
+pyftdi manual for the installation and setting proper access rights:
 <https://eblot.github.io/pyftdi/installation.html>. `pyftdi` required
 only if you are planning to use CPLD control functionality, but we are
 strongly suggest to install it.
-
-Depending on your Linux configuration, you might need to run
-`rcar_flash` as `root` to access your serial console device.
 
 ### Flashing your board
 
@@ -443,7 +444,7 @@ to the download mode, load flash_writer specified for h3ulcb_4x2, and stop.
 After that, you may open your serial port and work with flash_writer.
 
 ```
-sudo ./rcar_flash.py flash -c -f -b h3ulcb_4x2 -s /dev/ttyUSB0 none
+./rcar_flash.py flash -c -f -b h3ulcb_4x2 -s /dev/ttyUSB0 none
 ```
 
 Pay attention to the speed of the serial console. If the board supports
@@ -485,7 +486,7 @@ To boot into download mode on your Salvator X(S) board do the following:
 6. Upload your bootloaders:
 
 ```
-sudo ./rcar_flash.py flash -f -b h3_4x2 -s /dev/ttyUSB0 all
+./rcar_flash.py flash -f -b h3_4x2 -s /dev/ttyUSB0 all
 ```
 
 7. Power off the board again.
@@ -552,5 +553,5 @@ Flash only bl31 that has non-default name to the whitehawk
 
 Flash all loaders to the spider (s4) board that supports CPLD to swith into the flashing mode
 ```
-sudo ./rcar_flash.py flash -b s4 -c -f -s /dev/ttyUSB0 -p <path> all
+./rcar_flash.py flash -b s4 -c -f -s /dev/ttyUSB0 -p <path> all
 ```
