@@ -67,6 +67,13 @@ pyftdi manual for the installation and setting proper access rights:
 only if you are planning to use CPLD control functionality, but we are
 strongly suggest to install it.
 
+You can also install the `rcar_flash` tool as a package.
+To do that, use the following command:
+
+```
+pipx install git+https://github.com/xen-troops/rcar_flash.git
+```
+
 ### Flashing your board
 
 #### Choose your config
