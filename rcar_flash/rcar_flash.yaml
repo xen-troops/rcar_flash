@@ -420,7 +420,7 @@ board:
         flash_target: s4_qspi
       bl31:
         flash_target: s4_emmc
-        file: bl31-spider.srec
+        file: bl31.srec
         flash_addr: 0x7000
       bootparam:
         flash_target: s4_qspi
@@ -448,7 +448,7 @@ board:
         flash_addr: 0x40000
       tee:
         flash_target: s4_emmc
-        file: tee-spider.srec
+        file: tee.srec
         flash_addr: 0x7400
       u-boot:
         flash_target: s4_emmc
