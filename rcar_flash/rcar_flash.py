@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
 import os
-import serial
-import serial.tools.list_ports
 import logging
-import yaml
 import argparse
 import pathlib
 import traceback
 import time
 from string import printable
 from importlib.resources import files
+
+import serial
+import serial.tools.list_ports
+import yaml
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
