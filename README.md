@@ -220,6 +220,13 @@ Example:
     cr52                         0x500000            App_CDD_ICCOM_S4_Sample_CR52.srec        s4_qspi
     g4mh                         0x900000            App_CDD_ICCOM_S4_Sample_G4MH.srec        s4_qspi
 
+If some loader may have more than one filename, then this loader will be listed multiple times:
+
+    Loader                       Flash address       Default file                             Flash target
+    ------------------------------------------------------------------------------------------------------
+    bootparam                    0x0                 bootparam_sa0-4x2g.srec                  gen3_hf
+    bl2                          0x40000             bl2-h3ulcb-4x2g.srec                     gen3_hf
+    bl2                          0x40000             bl2-salvator-x-4x1g.srec                 gen3_hf
 
 ### `flash` sub-command
 
@@ -399,7 +406,20 @@ For each board there are multiple options possible:
 
 - `ipls` - mandatory - list of bootloaders that can be flashed to this
   board. Each entry should have the following options:
-    - `file` - default file name for said bootloader
+    - `file` - default file name for said bootloader. Two formats are
+      supported: string and list. For example
+
+      file: bl2-h3ulcb-4x2g.srec
+
+      means that only specified file is expected.
+
+      file:
+        - bl2-h3ulcb-4x2g.srec
+        - bl2-salvator-x-4x1g.srec
+
+      means that two filenames are supported, and the script will search
+      for the files according to the provided list. The first found file
+      will be used.
     - `flash_addr` - address in flash memory where to write this bootloader
     - `flash_target` - which "flash_target" to use while writing this
       bootloader. Flash targets are described in the one of the

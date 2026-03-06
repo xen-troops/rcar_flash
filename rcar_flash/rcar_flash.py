@@ -125,10 +125,15 @@ def do_list_loaders(conf, args):
     print(header)
     print("-" * len(header))
     ipls = board["ipls"]
-    loaders = [
-        (x, f'0x{ipls[x]["flash_addr"]:x}', ipls[x]["file"], ipls[x]["flash_target"])
-        for x in ipls.keys()
-    ]
+
+    loaders = []
+    for key, val in ipls.items():
+        file_field = val["file"]
+        if isinstance(file_field, str):
+            file_field = [file_field]
+        for f in file_field:
+            loaders.append([key, f'0x{val["flash_addr"]:x}', f, val["flash_target"]])
+
     # Sort twice. First time by address...
     loaders.sort(key=lambda x: int(x[1], 16))
     # And second time - by "flash_target" attribute
@@ -157,11 +162,18 @@ def do_flash(conf, args):  # noqa: C901
             if len(args.loaders) > 1:
                 raise Exception(
                     "You can either use 'all' or define list of loaders")
-            for k in board["ipls"].keys():
-                loaders[k] = os.path.join(args.path, board["ipls"][k]["file"])
-                if not os.path.exists(loaders[k]):
+            for k, ipl_info in board["ipls"].items():
+                raw_file = ipl_info.get("file", [])
+                file_candidates = [raw_file] if isinstance(raw_file, str) else raw_file
+                for filename in file_candidates:
+                    full_path = os.path.join(args.path, filename)
+                    if os.path.exists(full_path):
+                        loaders[k] = full_path
+                        break
+                else:
                     raise Exception(
-                        f"File {loaders[k]} for loader {k} does not exists!")
+                        f"No file found for loader '{k}' in {file_candidates}."
+                    )
         elif loader_arg == "none":
             # "none" is used when you need to upload flash_writer only
             # without any flashing of loaders
@@ -179,8 +191,19 @@ def do_flash(conf, args):  # noqa: C901
                 ipl_name = loader_arg
                 if ipl_name not in board["ipls"]:
                     raise Exception(f"Unknown loader name: {ipl_name}")
-                ipl_file = os.path.join(args.path,
-                                        board["ipls"][ipl_name]["file"])
+
+                raw_file = board["ipls"][ipl_name].get("file", [])
+                file_candidates = [raw_file] if isinstance(raw_file, str) else raw_file
+                for filename in file_candidates:
+                    full_path = os.path.join(args.path, filename)
+                    if os.path.exists(full_path):
+                        ipl_file = full_path
+                        break
+                else:
+                    raise Exception(
+                        f"No file found for loader '{k}' in {file_candidates}."
+                    )
+
             if not os.path.exists(ipl_file):
                 raise Exception(
                     f"File {ipl_file} for loader {ipl_name} does not exists!")
