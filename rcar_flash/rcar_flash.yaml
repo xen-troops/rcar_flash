@@ -176,7 +176,7 @@ board:
         flash_addr: 0x200000
         flash_target: gen3_hf
       u-boot:
-        file: u-boot-elf-salvator-xs-4x2g.srec
+        file: u-boot-elf-salvator-x.srec
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3_4x1:
@@ -184,19 +184,19 @@ board:
     sup_baud: 921600
     ipls:
       bootparam:
-        file: bootparam_sa0.srec
+        file: bootparam_sa0-4x1g.srec
         flash_addr: 0x0
         flash_target: gen3_hf
       bl2:
-        file: bl2-salvator-x.srec
+        file: bl2-salvator-x-4x1g.srec
         flash_addr: 0x40000
         flash_target: gen3_hf
       cert_header:
-        file: cert_header_sa6.srec
+        file: cert_header_sa6-4x1g.srec
         flash_addr: 0x180000
         flash_target: gen3_hf
       bl31:
-        file: bl31-salvator-x.srec
+        file: bl31-salvator-x-4x1g.srec
         flash_addr: 0x1C0000
         flash_target: gen3_hf
       tee:
@@ -204,7 +204,7 @@ board:
         flash_addr: 0x200000
         flash_target: gen3_hf
       u-boot:
-        file: u-boot-elf-salvator-xs.srec
+        file: u-boot-elf-salvator-x.srec
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3_4x2:
@@ -232,7 +232,7 @@ board:
         flash_addr: 0x200000
         flash_target: gen3_hf
       u-boot:
-        file: u-boot-elf-salvator-xs-4x2g.srec
+        file: u-boot-elf-salvator-x.srec
         flash_addr: 0x640000
         flash_target: gen3_hf
   h3ulcb:
